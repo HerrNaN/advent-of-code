@@ -1,5 +1,6 @@
 import days.Day2201
 import days.Day2202
+import days.Day2203
 import input.getInput
 import kotlin.system.exitProcess
 
@@ -40,6 +41,7 @@ fun main() {
 val days = mapOf(
     1 to Day2201(),
     2 to Day2202(),
+    3 to Day2203(),
 )
 
 fun <T : Any> runPart(day: Day<T>, part: Int, rawInput: String) {
