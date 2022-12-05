@@ -8,7 +8,7 @@ import common.space
 import days.Outcome.*
 import days.Shape.*
 
-typealias Input = List<Round>
+typealias Rounds = List<Round>
 typealias Round = Pair<Shape, Shape>
 
 fun Round.eval1(): Int = this.second.score + when {
@@ -79,10 +79,10 @@ enum class Outcome(val score: Int) {
     Lose(0)
 }
 
-class Day2202 : Day<Input>() {
-    override fun inputParser(): Parser<Input> = lines(round)
+class Day2202 : Day<Rounds>() {
+    override fun inputParser(): Parser<Rounds> = lines(round)
 
-    override fun solve1(input: Input): Int = input.sumOf { it.eval1() }
+    override fun solve1(input: Rounds): Int = input.sumOf(Round::eval1)
 
-    override fun solve2(input: Input): Int = input.sumOf { it.eval2() }
+    override fun solve2(input: Rounds): Int = input.sumOf(Round::eval2)
 }

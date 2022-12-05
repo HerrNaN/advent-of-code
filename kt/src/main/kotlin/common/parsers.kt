@@ -1,11 +1,9 @@
 package common
 
-import cc.ekblad.konbini.Parser
-import cc.ekblad.konbini.chain
-import cc.ekblad.konbini.parser
-import cc.ekblad.konbini.regex
+import cc.ekblad.konbini.*
 
 val newline = regex("\n")
 val space = regex(" ")
 
 fun <T> lines(p: Parser<T>) = parser { chain(p, newline).terms }
+fun <T> maybe(p: Parser<T>) = oneOf(p)
