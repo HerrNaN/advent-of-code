@@ -80,7 +80,7 @@ enum class Outcome(val score: Int) {
 }
 
 class Day2202 : Day<Rounds>() {
-    override fun inputParser(): Parser<Rounds> = lines(round)
+    override fun inputParser(): Parser<Rounds> = parser { lines(round) }
 
     override fun solve1(input: Rounds): Int = input.sumOf(Round::eval1)
 

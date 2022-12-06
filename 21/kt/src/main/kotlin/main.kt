@@ -10,8 +10,8 @@ fun main() {
 
 
     val input = when (System.`in`.available()) {
-        0 -> getInput(2021, day).getOrThrow()
-        else -> System.`in`.readBytes().toString()
+        0 -> getInput(2020, day).getOrThrow()
+        else -> System.`in`.readBytes().toString().trimEnd()
     }
 
     runPart(days[day]!!, part, input)
