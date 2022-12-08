@@ -9,11 +9,6 @@ import java.lang.Integer.max
 
 typealias Forest = Array<Array<Int>>
 
-sealed class Calculation {
-    object InProgress : Calculation()
-    class Resolved(val value: Boolean) : Calculation()
-}
-
 fun Forest.countVisible(): Int {
     var visCount = 0
     for (y in this.indices) {
