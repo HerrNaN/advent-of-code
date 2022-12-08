@@ -16,10 +16,12 @@ repositories {
 }
 
 val ktorVersion = "2.1.3"
+val arrow_version = "1.1.2"
 
 dependencies {
     testImplementation(kotlin("test"))
     implementation("cc.ekblad.konbini:konbini:0.1.2")
+    implementation("io.arrow-kt:arrow-core:$arrow_version")
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
 }
