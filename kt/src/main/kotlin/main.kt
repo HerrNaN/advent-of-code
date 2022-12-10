@@ -1,3 +1,4 @@
+import aoc.Part
 import days.*
 import input.getInput
 import kotlin.system.exitProcess
@@ -20,8 +21,9 @@ fun main() {
     }
 
     val part = when (System.getenv()["part"]) {
-        "part2" -> 2
-        else -> 1
+        "both" -> Part.Both
+        "part2" -> Part.Two
+        else -> Part.One
     }
 
     val input = getInput(year, day).getOrThrow()
@@ -32,7 +34,10 @@ fun main() {
             exitProcess(1)
         }
 
-        else -> runPart(solution, part, input)
+        else -> {
+            println("=== Day %02d ===".format(day))
+            runPart(solution, part, input)
+        }
     }
 }
 
@@ -45,14 +50,19 @@ val days = mapOf(
     6 to Day2206(),
     7 to Day2207(),
     8 to Day2208(),
+    9 to Day2209(),
 )
 
-fun <T : Any> runPart(day: Day<T>, part: Int, rawInput: String) {
-    print("Part $part: ")
+fun <T : Any> runPart(day: Day<T>, part: Part, rawInput: String) {
     try {
-        when (part) {
-            1 -> println(day.solve1(day.parseInput(rawInput)))
-            2 -> println(day.solve2(day.parseInput(rawInput)))
+        if (part == Part.One || part == Part.Both) {
+            print("Part 1: ")
+            println(day.solve1(day.parseInput(rawInput)))
+        }
+
+        if (part == Part.Two || part == Part.Both) {
+            print("Part 2: ")
+            println(day.solve2(day.parseInput(rawInput)))
         }
     } catch (e: NotImplementedError) {
         println(e.message)

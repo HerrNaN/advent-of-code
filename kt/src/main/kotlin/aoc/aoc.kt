@@ -1,7 +1,7 @@
 package aoc
 
 enum class Part {
-    One, Two
+    One, Two, Both
 }
 
 typealias Day = Int
