@@ -19,16 +19,29 @@ class Day2210 : Day<List<Day2210.Instr>>() {
         ) { acc, cycle ->
 //            println(acc.toString())
             Pair(cycle, acc.second.tick())
-        }.filter { setOf(20, 60, 100, 140, 180, 220).contains(it.first) }
+        }.filter { it.first in setOf(20, 60, 100, 140, 180, 220) }
 //            .map { println(it); it }
             .sumOf { it.second.x * it.first }
 
 
-    override fun solve2(input: List<Instr>): Int = TODO()
+    override fun solve2(input: List<Instr>): String = "\n" +
+            (2..240).scan(
+                Pair(1, CPU(1, input))
+            ) { acc, cycle ->
+                Pair(cycle, acc.second.tick())
+            }.map { Pair(it.first, it.second.x) }
+                .map {
+                    when {
+                        ((it.first - 1) % 40) in listOf(it.second - 1, it.second, it.second + 1) -> '#'
+                        else -> '.'
+                    }
+                }.joinToString("")
+                .chunked(40)
+                .joinToString("\n")
 
-    sealed class Instr(val cycles: Int) {
-        data class AddX(val v: Int) : Instr(2)
-        object Noop : Instr(1)
+    sealed class Instr {
+        data class AddX(val v: Int) : Instr()
+        object Noop : Instr()
     }
 
     internal data class CPU(
