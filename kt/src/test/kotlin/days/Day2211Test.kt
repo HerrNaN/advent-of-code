@@ -1,6 +1,7 @@
 package days
 
 import org.junit.jupiter.api.Test
+import java.math.BigInteger
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
@@ -8,48 +9,37 @@ internal class Day2211Test {
 
     val testInput: List<Day2211.Monkey> = listOf(
         Day2211.Monkey(
-            startingItems = mutableListOf(79, 98),
-            op = { old -> old * 19 },
-            next = { worry ->
-                if (worry % 23 == 0) {
-                    2
-                } else {
-                    3
-                }
-            }
+            startingItems = mutableListOf(BigInteger.valueOf(79), BigInteger.valueOf(98)),
+            op = { old -> old * BigInteger.valueOf(19) },
+            divider = BigInteger.valueOf(23),
+            trueThrow = 2,
+            falseThrow = 3,
         ),
         Day2211.Monkey(
-            startingItems = mutableListOf(54, 65, 75, 74),
-            op = { old -> old + 6 },
-            next = { worry ->
-                if (worry % 19 == 0) {
-                    2
-                } else {
-                    0
-                }
-            }
+            startingItems = mutableListOf(
+                BigInteger.valueOf(54),
+                BigInteger.valueOf(65),
+                BigInteger.valueOf(75),
+                BigInteger.valueOf(74)
+            ),
+            op = { old -> old + BigInteger.valueOf(6) },
+            divider = BigInteger.valueOf(19),
+            trueThrow = 2,
+            falseThrow = 0,
         ),
         Day2211.Monkey(
-            startingItems = mutableListOf(79, 60, 97),
+            startingItems = mutableListOf(BigInteger.valueOf(79), BigInteger.valueOf(60), BigInteger.valueOf(97)),
             op = { old -> old * old },
-            next = { worry ->
-                if (worry % 13 == 0) {
-                    1
-                } else {
-                    3
-                }
-            }
+            divider = BigInteger.valueOf(13),
+            trueThrow = 1,
+            falseThrow = 3,
         ),
         Day2211.Monkey(
-            startingItems = mutableListOf(74),
-            op = { old -> old + 3 },
-            next = { worry ->
-                if (worry % 17 == 0) {
-                    0
-                } else {
-                    1
-                }
-            }
+            startingItems = mutableListOf(BigInteger.valueOf(74)),
+            op = { old -> old + BigInteger.valueOf(3) },
+            divider = BigInteger.valueOf(17),
+            trueThrow = 0,
+            falseThrow = 1,
         )
 
     )
@@ -99,5 +89,6 @@ Monkey 3:
 
     @Test
     fun solve2() {
+        assertEquals(2713310158, Day2211().solve2(testInput))
     }
 }
