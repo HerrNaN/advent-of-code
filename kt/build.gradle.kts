@@ -30,6 +30,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.withType<Test> {
+    this.testLogging {
+        this.showStandardStreams = true
+    }
+}
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "17"
 }
