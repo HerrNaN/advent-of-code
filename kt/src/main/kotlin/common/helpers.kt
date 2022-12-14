@@ -28,6 +28,8 @@ enum class Dir2(val p: Point2) {
     DownLeft(Down.p + Left.p)
 }
 
+fun neighbours(p: Point2): List<Point2> = listOf(Dir2.Up, Dir2.Down, Dir2.Left, Dir2.Right).map { p + it.p }
+
 fun MutableSet<Point2>.toGrid(): String {
     val minY = this.minBy { it.y }.y
     val minX = this.minBy { it.x }.x
