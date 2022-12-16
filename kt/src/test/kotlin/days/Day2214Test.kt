@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 
 internal class Day2214Test {
 
-    val testInput: Slice = mapOf(
+    val testInput: Slice = mutableMapOf(
         // Formation 1
         Point2(498, 4) to Rock,
         Point2(498, 5) to Rock,

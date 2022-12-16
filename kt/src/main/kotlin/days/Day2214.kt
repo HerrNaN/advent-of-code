@@ -8,7 +8,7 @@ import common.newline
 import days.Day2214.Material.Rock
 import days.Day2214.Material.Sand
 
-internal typealias Slice = Map<Point2, Day2214.Material>
+internal typealias Slice = MutableMap<Point2, Day2214.Material>
 
 class Day2214 : Day<Slice>() {
     override fun inputParser(): Parser<Slice> = parser {
@@ -40,30 +40,26 @@ class Day2214 : Day<Slice>() {
     }
 
     override fun solve1(input: Slice): Int {
-        var s = input
+        val floorLevel = input.keys.maxOf { it.y }
         var counter = 0
         while (true) {
-            val res = s.dropSand(null)
-            if (res.second) {
+            if (input.dropSand(floorLevel)) {
                 return counter
             }
             counter++
-            s = res.first
         }
     }
 
     override fun solve2(input: Slice): Int {
         val floorLevel = input.keys.maxOf { it.y } + 2
 
-        var s = input
         var counter = 0
         while (true) {
-            val res = s.dropSand(floorLevel)
             counter++
-            if (res.first.containsKey(source)) {
+            input.dropSand(floorLevel)
+            if (input.containsKey(source)) {
                 return counter
             }
-            s = res.first
         }
     }
 
@@ -83,41 +79,36 @@ class Day2214 : Day<Slice>() {
     private val source = Point2(500, 0)
 
     // Can the source be clogged? Yes in part 2
-    private fun Slice.dropSand(floorLevel: Int?): Pair<Slice, Boolean> {
+    private fun Slice.dropSand(floorLevel: Int): Boolean {
         var grain = source
-        val lowestPoint = this.filter { it.value == Rock }.map { it.key.y }.max()
 
         while (true) {
-            val next = this.next(grain, floorLevel)
+            val next = this.next(grain)
             if (next == grain) {
-                return Pair(this.plus(grain to Sand), false)
+                this[grain] = Sand
+                return false
             }
 
-            if (floorLevel == null && next.y > lowestPoint) {
-                return Pair(this, true)
+            if (next.y >= floorLevel) {
+                this[grain] = Sand
+                return true
             }
 
             grain = next
         }
     }
 
-    fun Slice.next(p: Point2, floorLevel: Int?): Point2 {
-        if (floorLevel != null && p.y + 1 == floorLevel) {
-            return p
-        }
+    fun Slice.next(p: Point2): Point2 = when {
+        !this.containsKey(p + Dir2.Up.p) ->
+            p + Dir2.Up.p
 
-        return when {
-            !this.containsKey(p + Dir2.Up.p) ->
-                p + Dir2.Up.p
+        !this.containsKey(p + Dir2.UpLeft.p) ->
+            p + Dir2.UpLeft.p
 
-            !this.containsKey(p + Dir2.UpLeft.p) ->
-                p + Dir2.UpLeft.p
+        !this.containsKey(p + Dir2.UpRight.p) ->
+            p + Dir2.UpRight.p
 
-            !this.containsKey(p + Dir2.UpRight.p) ->
-                p + Dir2.UpRight.p
-
-            else -> p
-        }
+        else -> p
     }
 
 }
