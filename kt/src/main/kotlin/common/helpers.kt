@@ -12,6 +12,11 @@ data class Point2(val x: Int = 0, val y: Int = 0) {
         val d = this - other
         return max(abs(d.x), abs(d.y))
     }
+
+    fun manhattan(other: Point2): Int {
+        val d = this - other
+        return abs(d.x) + abs(d.y)
+    }
 }
 
 fun Point2.move(dir: Dir2): Point2 = this + dir.p

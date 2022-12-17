@@ -56,6 +56,7 @@ val days = mapOf(
     12 to Day2212(),
     13 to Day2213(),
     14 to Day2214(),
+    15 to Day2215(),
 )
 
 fun <T : Any> runPart(day: Day<T>, part: Part, rawInput: String) {
