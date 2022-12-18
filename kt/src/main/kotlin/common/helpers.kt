@@ -55,3 +55,16 @@ fun MutableSet<Point2>.toGrid(): String {
     }
     return grid.joinToString("\n")
 }
+
+fun <K1, K2, V> Map<K1, Map<K2, V>>.invert(): Map<K2, Map<K1, V>> {
+    return this.flatMap { e1 ->
+        e1.value.map { e2 ->
+            Triple(e1.key, e2.key, e2.value)
+        }
+    }.groupBy { it.second }
+        .mapValues { e2 ->
+            e2.value.associate { t ->
+                Pair(t.first, t.third)
+            }
+        }
+}
