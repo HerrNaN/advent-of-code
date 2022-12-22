@@ -34,6 +34,16 @@ data class Point3(val x: Int = 0, val y: Int = 0, val z: Int = 0) {
         val d = this - other
         return abs(d.x) + abs(d.y) + abs(d.z)
     }
+
+    fun neighbours(): Set<Point3> =
+        setOf(
+            this + Point3(1, 0, 0),
+            this + Point3(0, 1, 0),
+            this + Point3(0, 0, 1),
+            this + Point3(-1, 0, 0),
+            this + Point3(0, -1, 0),
+            this + Point3(0, 0, -1)
+        )
 }
 
 fun Point2.move(dir: Dir2): Point2 = this + dir.p

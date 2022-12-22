@@ -57,5 +57,9 @@ internal class Day2218Test {
 
     @Test
     fun solve2() {
+        assertEquals(
+            58,
+            Day2218().solve2(testInput)
+        )
     }
 }
