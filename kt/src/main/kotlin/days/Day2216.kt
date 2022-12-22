@@ -85,7 +85,6 @@ class Day2216 : Day<ValveReports>() {
                 cache.clear()
                 if (p1 + p2 > max) {
                     max = p1 + p2
-                    println(max)
                 }
             }
 
