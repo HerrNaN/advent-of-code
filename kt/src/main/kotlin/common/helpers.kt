@@ -68,3 +68,21 @@ fun <K1, K2, V> Map<K1, Map<K2, V>>.invert(): Map<K2, Map<K1, V>> {
             }
         }
 }
+
+fun <T> Set<T>.possibleSplitsIn2(): List<Pair<Set<T>, Set<T>>> {
+    if (this.size < 2) throw IllegalArgumentException()
+    return this.toList().possibleOrders().flatMap {
+        (1 until this.size).map { n ->
+            Pair(it.take(n).toSet(), it.drop(n).toSet())
+        }
+    }.distinctBy { it.first }
+}
+
+fun <T> List<T>.possibleOrders(): List<List<T>> {
+    if (this.isEmpty()) return emptyList()
+    if (this.size == 1) return listOf(this.toList())
+    return this.flatMap { e ->
+        (this - e).possibleOrders().map { listOf(e) + it }
+    }
+}
+

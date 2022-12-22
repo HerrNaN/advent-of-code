@@ -6,6 +6,7 @@ import common.exactly
 import common.letter
 import common.lines
 import days.Day2216.ValveReport
+import days.Day2216.Volcano.Elephant
 import java.util.*
 
 typealias ValveReports = List<ValveReport>
@@ -18,52 +19,138 @@ class Day2216 : Day<ValveReports>() {
             distMap(input),
             input.rates()
         ).maxPressure(
-            "AA",
+            listOf(Elephant("AA", null)),
             30,
-            input.filter { it.name != "AA" }.filter { it.rate != 0 }.map { it.name }.toSet(), 0
+            input.filter { it.rate != 0 }.map { it.name }.toSet(), 0
         )
     }
 
 
-    override fun solve2(input: ValveReports): Int = TODO()
+    // Tried 2046 -> Too low
+    override fun solve2(input: ValveReports): Int {
+        return Volcano(
+            distMap(input),
+            input.rates()
+        ).maxPressure(
+            listOf(Elephant("AA", null), Elephant("AA", null)),
+            26,
+            input.filter { it.rate != 0 }.map { it.name }.toSet(), 0
+        )
+    }
 
     class Volcano(
         private val distFromTo: Map<String, Map<String, Int>>,
         private val rates: Map<String, Int>,
     ) {
 
-        private val cache = mutableMapOf<State, Int>()
+        internal class Cache(
+            private val c: MutableMap<State, Int>,
+        ) {
+            var counter = 0
+//            var max = 0
+
+            fun containsKey(s: State): Boolean {
+                return c.containsKey(s)
+            }
+
+            fun get(s: State): Int? {
+                return c[s]
+            }
+
+            fun set(s: State, v: Int) {
+                counter++
+                if (counter % 100000 == 0) {
+                    println(c.maxOf { it.value })
+                }
+                c[s] = v
+            }
+        }
+
+        private val cache = Cache(mutableMapOf())
 
         internal data class State(
-            val cur: String,
+            val ps: List<Elephant>,
             val minutesLeft: Int,
             val available: Set<String>,
         )
 
-        fun maxPressure(cur: String, minutesLeft: Int, available: Set<String>, ppm: Int): Int {
-            if (minutesLeft < 0) throw Error("more than 30!")
+        data class Elephant(val cur: String, val goal: Pair<String, Int>?)
+
+        fun maxPressure(ps: List<Elephant>, minutesLeft: Int, available: Set<String>, ppm: Int): Int {
+            if (minutesLeft < 0) throw Error("time exceeded!")
             if (minutesLeft == 0) return 0
 
-            val state = State(cur, minutesLeft, available)
+            val state = State(ps, minutesLeft, available.toSet())
             if (cache.containsKey(state)) {
-//                println("cache hit!")
-                return cache[state]!!
+                return cache.get(state)!!
             }
 
-            val reachable = available.filter { distFromTo[cur]!![it]!! < minutesLeft }
-            if (reachable.isEmpty()) return minutesLeft * ppm
+            if (ps.isEmpty()) return ppm * minutesLeft
 
-            cache[state] = reachable.maxOf {
-                val time = distFromTo[cur]!![it]!! + 1
-                time * ppm + maxPressure(
-                    it,
-                    minutesLeft - time,
-                    available - it,
-                    ppm + rates[it]!!
+            // Open valves
+            var newPPM = ppm
+            for (p in ps) {
+                if (p.goal != null && p.goal.second == 0) {
+                    newPPM += rates[p.goal.first]!!
+                }
+            }
+
+            var newMinutesLeft = minutesLeft
+
+            if (newPPM != ppm) {
+                newMinutesLeft--
+            }
+
+            val newPs = ps.map {
+                if (it.goal != null) {
+                    if (it.goal.second == 0) {
+                        it.copy(cur = it.goal.first, goal = null)
+                    } else {
+                        it.copy(goal = it.goal.copy(second = it.goal.second - 1))
+                    }
+                } else {
+                    it
+                }
+            }
+
+            // Make sure everyone that can has a goal
+            if (newPs.any { it.goal == null }) {
+                cache.set(state, newPs.filter { it.goal == null }.maxOf { p ->
+                    val reachable = available.filter { distFromTo[p.cur]!![it]!! < newMinutesLeft - 1 }
+                    if (reachable.isEmpty()) return maxPressure(newPs - p, newMinutesLeft, available, newPPM)
+
+                    reachable.maxOf {
+                        maxPressure(
+                            newPs - p + p.copy(goal = Pair(it, distFromTo[p.cur]!![it]!!)),
+                            newMinutesLeft,
+                            available - it,
+                            newPPM
+                        )
+                    }
+                })
+                return cache.get(state)!!
+            }
+
+
+            // Move to valves
+            val p = newPs.minBy { it.goal!!.second }
+            cache.set(
+                state, newPPM * p.goal!!.second + maxPressure(
+                    newPs.map {
+                        it.copy(goal = Pair(it.goal!!.first, it.goal.second - p.goal.second))
+                    },
+                    newMinutesLeft - p.goal.second,
+                    available,
+                    newPPM
                 )
-            }
-            return cache[state]!!
+            )
+            return cache.get(state)!!
         }
+
+//        fun maxP(): Int {
+//            while
+//        }
+
     }
 
     data class ValveReport(
