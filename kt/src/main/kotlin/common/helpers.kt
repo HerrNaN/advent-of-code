@@ -46,6 +46,22 @@ data class Point3(val x: Int = 0, val y: Int = 0, val z: Int = 0) {
         )
 }
 
+fun Set<Point3>.connectedTo(start: Point3): Set<Point3> {
+    val connected = mutableSetOf<Point3>()
+    val toConnect = mutableSetOf(start)
+
+    while (toConnect.isNotEmpty()) {
+        val p = toConnect.first()
+        toConnect -= p
+        connected += p
+
+        toConnect.addAll(p.neighbours().minus(connected + toConnect) intersect this)
+    }
+
+    return connected
+}
+
+
 fun Point2.move(dir: Dir2): Point2 = this + dir.p
 
 enum class Dir2(val p: Point2) {

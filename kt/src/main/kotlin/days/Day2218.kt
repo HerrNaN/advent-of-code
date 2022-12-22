@@ -6,6 +6,7 @@ import cc.ekblad.konbini.char
 import cc.ekblad.konbini.integer
 import cc.ekblad.konbini.parser
 import common.Point3
+import common.connectedTo
 import common.lines
 
 class Day2218 : Day<List<Point3>>() {
@@ -41,21 +42,6 @@ class Day2218 : Day<List<Point3>>() {
 
         val interior = cube.toList().surface().size
         return input.surface().size - interior
-    }
-
-    private fun Set<Point3>.connectedTo(start: Point3): Set<Point3> {
-        val connected = mutableSetOf<Point3>()
-        val toConnect = mutableSetOf(start)
-
-        while (toConnect.isNotEmpty()) {
-            val p = toConnect.first()
-            toConnect -= p
-            connected += p
-
-            toConnect.addAll(p.neighbours().minus(connected + toConnect) intersect this)
-        }
-
-        return connected
     }
 
     private fun cubeOf(xs: IntRange, ys: IntRange, zs: IntRange): Set<Point3> =
