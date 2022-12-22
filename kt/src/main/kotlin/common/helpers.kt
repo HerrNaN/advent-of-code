@@ -20,6 +20,22 @@ data class Point2(val x: Int = 0, val y: Int = 0) {
     }
 }
 
+data class Point3(val x: Int = 0, val y: Int = 0, val z: Int = 0) {
+    operator fun unaryMinus(): Point3 = Point3(-x, -y, -z)
+    operator fun plus(other: Point3) = Point3(x + other.x, y + other.y, z + other.z)
+    operator fun minus(other: Point3) = Point3(x - other.x, y - other.y, z - other.z)
+
+    fun distTo(other: Point3): Int {
+        val d = this - other
+        return max(max(abs(d.x), abs(d.y)), abs(d.z))
+    }
+
+    fun manhattan(other: Point3): Int {
+        val d = this - other
+        return abs(d.x) + abs(d.y) + abs(d.z)
+    }
+}
+
 fun Point2.move(dir: Dir2): Point2 = this + dir.p
 
 enum class Dir2(val p: Point2) {
