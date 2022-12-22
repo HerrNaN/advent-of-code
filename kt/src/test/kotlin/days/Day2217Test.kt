@@ -50,7 +50,8 @@ internal class Day2217Test {
         Right
     )
 
-    val testRawInput = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>"
+    val testRawInput =
+        ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>"
 
     @Test
     fun inputParser() {
@@ -62,9 +63,17 @@ internal class Day2217Test {
 
     @Test
     fun solve1() {
+        assertEquals(
+            3068,
+            Day2217().solve1(testInput)
+        )
     }
 
     @Test
     fun solve2() {
+        assertEquals(
+            1_514_285_714_288,
+            Day2217().solve2(testInput)
+        )
     }
 }
