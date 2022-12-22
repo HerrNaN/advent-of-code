@@ -2,6 +2,7 @@ package common
 
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.math.pow
 
 data class Point2(val x: Int = 0, val y: Int = 0) {
     operator fun unaryMinus(): Point2 = Point2(-x, -y)
@@ -67,4 +68,18 @@ fun <K1, K2, V> Map<K1, Map<K2, V>>.invert(): Map<K2, Map<K1, V>> {
                 Pair(t.first, t.third)
             }
         }
+}
+
+fun UInt.complement(): UInt = this xor UInt.MAX_VALUE
+
+fun getSubsetSelectors(nBits: Int): List<UInt> = (0U..2.0.pow(nBits.toDouble()).toUInt()).toList()
+
+fun <T> uintAsSubset(n: UInt, l: List<T>): List<T> {
+    val subset = mutableListOf<T>()
+    for (i in l.indices) {
+        if ((n.shr(i) and 1U) == 1U) {
+            subset.add(l[i])
+        }
+    }
+    return subset
 }

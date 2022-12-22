@@ -2,9 +2,7 @@ package days
 
 import Day
 import cc.ekblad.konbini.*
-import common.exactly
-import common.letter
-import common.lines
+import common.*
 import days.Day2216.ValveReport
 import java.util.*
 
@@ -20,12 +18,21 @@ class Day2216 : Day<ValveReports>() {
         ).maxPressure(
             "AA",
             30,
-            input.filter { it.name != "AA" }.filter { it.rate != 0 }.map { it.name }.toSet(), 0
+            input.filter { it.rate != 0 }.map { it.name }.toSet(),
+            0
         )
     }
 
 
-    override fun solve2(input: ValveReports): Int = TODO()
+    override fun solve2(input: ValveReports): Int {
+        return Volcano(
+            distMap(input),
+            input.rates()
+        ).maxPressure2(
+            "AA",
+            input.filter { it.rate != 0 }.map { it.name }.toSet()
+        )
+    }
 
     class Volcano(
         private val distFromTo: Map<String, Map<String, Int>>,
@@ -41,12 +48,11 @@ class Day2216 : Day<ValveReports>() {
         )
 
         fun maxPressure(cur: String, minutesLeft: Int, available: Set<String>, ppm: Int): Int {
-            if (minutesLeft < 0) throw Error("more than 30!")
+            if (minutesLeft < 0) throw Error("time exceeded!")
             if (minutesLeft == 0) return 0
 
             val state = State(cur, minutesLeft, available)
             if (cache.containsKey(state)) {
-//                println("cache hit!")
                 return cache[state]!!
             }
 
@@ -63,6 +69,27 @@ class Day2216 : Day<ValveReports>() {
                 )
             }
             return cache[state]!!
+        }
+
+        fun maxPressure2(start: String, available: Set<String>): Int {
+            val subsets: List<Set<String>> =
+                getSubsetSelectors(available.size).map { uintAsSubset(it, available.toList()).toSet() }
+            val complements: List<Set<String>> =
+                getSubsetSelectors(available.size).map { uintAsSubset(it.complement(), available.toList()).toSet() }
+
+
+            var max = 0
+            for (i in subsets.indices) {
+                val p1 = maxPressure(start, 26, subsets[i], 0)
+                val p2 = maxPressure(start, 26, complements[i], 0)
+                cache.clear()
+                if (p1 + p2 > max) {
+                    max = p1 + p2
+                    println(max)
+                }
+            }
+
+            return max
         }
     }
 
