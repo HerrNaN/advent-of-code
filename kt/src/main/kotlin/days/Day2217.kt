@@ -18,8 +18,8 @@ class Day2217 : Day<List<Dir2>>() {
             }
         )
 
-    val leftWall = 0
-    val rightWall = 8
+    private val leftWall = 0
+    private val rightWall = 8
 
     override fun solve1(input: List<Dir2>): Long = heightAfter(input, 2022)
 
@@ -45,12 +45,11 @@ class Day2217 : Day<List<Dir2>>() {
     data class State(
         val jetIndex: Long,
         val rockIndex: Long,
-//        val top: List<Boolean>,
     )
 
     private fun heightAfter(input: List<Dir2>, totRocks: Long): Long {
         val triple = findRepeatSim(input)
-        return (totRocks / triple.second.toLong()) * triple.first.toLong() + triple.third[totRocks % triple.second.toLong()]!!.toLong()
+        return (totRocks / triple.second) * triple.first + triple.third[totRocks % triple.second]!!
     }
 
     private fun findRepeatSim(input: List<Dir2>): Triple<Long, Long, Map<Long, Long>> {
@@ -61,7 +60,6 @@ class Day2217 : Day<List<Dir2>>() {
         var state = State(
             0,
             0,
-//            listOf(true, true, true, true, true, true, true)
         )
 
         val states = mutableMapOf<State, Long>()
@@ -77,7 +75,6 @@ class Day2217 : Day<List<Dir2>>() {
             if (current == null) {
                 val n = rocksOrder[state.rockIndex.toInt()]
                 if (states.contains(state)) {
-                    println("Repeat found at height $max after $nRocks rocks")
                     return Triple(max - maxAt[states[state]!!]!!, nRocks - states[state]!!, maxAt)
                 }
                 if (chamber.contains(Point2(4, max.toInt())) && state.rockIndex == 0L) {
@@ -110,7 +107,6 @@ class Day2217 : Day<List<Dir2>>() {
                 ) {
                     state = state.copy(
                         rockIndex = (state.rockIndex + 1) % rocksOrder.size,
-//                        top = (1..7).map { chamber.contains(Point2(it, max)) }
                     )
                     nRocks++
                     chamber.addAll(current.content)
