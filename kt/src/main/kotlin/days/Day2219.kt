@@ -14,12 +14,11 @@ class Day2219 : Day<List<Blueprint>>() {
     override fun solve1(input: List<Blueprint>): Int =
         input.mapIndexed { i, b ->
             val m = maxOf(b, Geode, 24)
-//            println(m)
             (i + 1) * m
         }.sum()
 
     override fun solve2(input: List<Blueprint>): Int =
-        input.take(3).map { maxOf(it, Geode, 32) }.fold(1) { acc, i -> acc * i }
+        input.take(3).map { maxOf(it, Geode, 32) }.reduce(Int::times)
 
 
     data class State(
@@ -28,7 +27,6 @@ class Day2219 : Day<List<Blueprint>>() {
         val remaining: Int,
         val produced: Counters<Resource>,
     ) : Comparable<State> {
-
 
         fun hash(): Counters<Resource> = produced unionPlus bots
 
@@ -56,7 +54,7 @@ class Day2219 : Day<List<Blueprint>>() {
         private fun produce(r: Resource, cost: Counters<Resource>): State? {
             if (remaining == 1) return null
             if (couldNeverPay(cost)) return null
-            if (couldHavePayedForLastIncarnation(cost)) return null
+//            if (couldHavePayedForLastIncarnation(cost)) return null
 
             var newState = this
             while (newState.remaining > 0 && newState.bots == this.bots) {
@@ -86,17 +84,12 @@ class Day2219 : Day<List<Blueprint>>() {
         private fun Counters<Resource>.canAfford(cost: Counters<Resource>): Boolean =
             (this unionMinus cost).minOf { it.value } >= 0
 
-        fun bestEstimateFor(r: Resource): Int {
-            return ((bots.getOrDefault(r, 0) + remaining) * remaining) + resources.getOrDefault(r, 0)
-
-//            return resources.getOrDefault(r, 0) +
-//                    (0..remaining).sumOf { bots.getOrDefault(r, 0) + it }
-        }
+        fun bestEstimateFor(r: Resource): Int =
+            resources.getOrDefault(r, 0) +
+                    (0..remaining).sumOf { bots.getOrDefault(r, 0) + it }
 
         // Used for the priority queue in the A* search
         override fun compareTo(other: State): Int =
-//            produced.getOrDefault(Geode, 0).compareTo(other.produced.getOrDefault(Geode, 0))
-
             other.bestEstimateFor(Geode).compareTo(this.bestEstimateFor(Geode))
 
         override fun toString(): String {
@@ -161,32 +154,28 @@ fun newState(remaining: Int): State =
 
 fun maxOf(b: Blueprint, r: Resource, after: Int): Int {
     val candidates = PriorityQueue<State>().apply { add(newState(after)) }
-//    val candidates = ArrayDeque(listOf(initialState))
-//    val candidates = LinkedList(listOf(initialState))
-    val seen = mutableSetOf<Counters<Resource>>()
-//    val prev = mutableMapOf<State, State>()
+    val seen = mutableSetOf<State>()
     var mostOfResource = 0
 
     while (candidates.isNotEmpty()) {
         val s = candidates.poll()
 
-        mostOfResource = maxOf(mostOfResource, s.resources.getOrDefault(r, 0))
-
-
-//        if (seen.contains(s.hash())) {
-//            continue
+//        if (s.remaining == 0) {
+//            return s.resources.getOrDefault(r, 0)
 //        }
 
-        seen += s.hash()
+        if (seen.contains(s)) {
+            continue
+        }
 
-        s.nextStates(b)
+        mostOfResource = maxOf(mostOfResource, s.resources.getOrDefault(r, 0))
+
+        seen += s
+
+        candidates += s.nextStates(b)
             .filter { it.remaining >= 0 }
-            .filter { it.bestEstimateFor(Geode) > mostOfResource }
-            .filter { !seen.contains(it.hash()) }
-            .forEach {
-                candidates.add(it)
-//                prev[it] = s
-            }
+            .filter { it.bestEstimateFor(Geode) >= mostOfResource }
+            .filter { !seen.contains(it) }
     }
 
     return mostOfResource

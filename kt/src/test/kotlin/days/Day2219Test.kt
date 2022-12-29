@@ -1,6 +1,7 @@
 package days
 
 import days.Day2219.Resource.*
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -74,11 +75,26 @@ internal class Day2219Test {
         assertEquals(62 * 56, Day2219().solve2(testInput))
     }
 
-    @Test
-    fun maxOf() {
-        assertEquals(9, maxOf(testInput[0], Geode, 24))
-        assertEquals(12, maxOf(testInput[1], Geode, 24))
-//        assertEquals(56, maxOf(testInput[0], Geode, 32))
-//        assertEquals(62, maxOf(testInput[1], Geode, 32))
+    @Nested
+    inner class MaxOf {
+        @Test
+        fun part1_ex1() {
+            assertEquals(9, maxOf(testInput[0], Geode, 24))
+        }
+
+        @Test
+        fun part1_ex2() {
+            assertEquals(12, maxOf(testInput[1], Geode, 24))
+        }
+
+        @Test
+        fun part2_ex1() {
+            assertEquals(56, maxOf(testInput[0], Geode, 32))
+        }
+
+        @Test
+        fun part2_ex2() {
+            assertEquals(62, maxOf(testInput[1], Geode, 32))
+        }
     }
 }
