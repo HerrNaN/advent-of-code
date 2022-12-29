@@ -125,3 +125,20 @@ fun <T> uintAsSubset(n: UInt, l: List<T>): List<T> {
     }
     return subset
 }
+
+
+infix fun <K> Map<K, Int>.unionPlus(other: Map<K, Int>): Map<K, Int> =
+    (this.keys union other.keys).associateWith {
+        (this[it] ?: 0) + (other[it] ?: 0)
+    }
+
+infix fun <K> Map<K, Int>.unionMinus(other: Map<K, Int>): Map<K, Int> =
+    (this.keys union other.keys).associateWith {
+        (this[it] ?: 0) - (other[it] ?: 0)
+    }
+
+
+infix fun <K> Map<K, Int>.scalarTimes(n: Int): Map<K, Int> = this.mapValues { it.value * n }
+
+typealias Counters<T> = Map<T, Int>
+
