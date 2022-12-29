@@ -54,7 +54,7 @@ class Day2219 : Day<List<Blueprint>>() {
         private fun produce(r: Resource, cost: Counters<Resource>): State? {
             if (remaining == 1) return null
             if (couldNeverPay(cost)) return null
-//            if (couldHavePayedForLastIncarnation(cost)) return null
+            if (couldHavePayedForLastIncarnation(cost)) return null
 
             var newState = this
             while (newState.remaining > 0 && newState.bots == this.bots) {
@@ -160,9 +160,9 @@ fun maxOf(b: Blueprint, r: Resource, after: Int): Int {
     while (candidates.isNotEmpty()) {
         val s = candidates.poll()
 
-//        if (s.remaining == 0) {
-//            return s.resources.getOrDefault(r, 0)
-//        }
+        if (s.remaining == 0) {
+            return s.resources.getOrDefault(r, 0)
+        }
 
         if (seen.contains(s)) {
             continue
