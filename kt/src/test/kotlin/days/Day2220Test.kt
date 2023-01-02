@@ -5,7 +5,7 @@ import kotlin.test.assertEquals
 
 internal class Day2220Test {
 
-    val testInput = listOf(
+    val testInput = listOf<Long>(
         1,
         2,
         -3,
@@ -40,6 +40,6 @@ internal class Day2220Test {
 
     @Test
     fun solve2() {
-        TODO()
+        assertEquals(1623178306, Day2220().solve2(testInput))
     }
 }
