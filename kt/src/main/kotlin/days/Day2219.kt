@@ -28,12 +28,11 @@ class Day2219 : Day<List<Blueprint>>() {
         val produced: Counters<Resource>,
     ) : Comparable<State> {
 
-        fun hash(): Counters<Resource> = produced unionPlus bots
-
         fun nextStates(b: Blueprint): List<State> =
             b
-//                .filter { !haveEnough(it.key, b) }
-                .mapNotNull {
+                .filter { canBuy(it.value) }
+                .filter { shouldBuy(it.key, it.value, b) }
+                .map {
                     produce(it.key, it.value)
                 } + copy(
                 resources = resources unionPlus (bots scalarTimes remaining),
@@ -41,21 +40,31 @@ class Day2219 : Day<List<Blueprint>>() {
                 remaining = 0
             )
 
-        private fun haveEnough(r: Resource, b: Blueprint): Boolean {
-            return bots.getOrDefault(r, 0) >= b[Geode]!!.getOrDefault(r, 0)
-//            return bots.getOrDefault(r, 0) >= b.maxOf { it.value.getOrDefault(r, 0) }
+        private fun shouldBuy(r: Resource, cost: Counters<Resource>, b: Blueprint): Boolean {
+            // Always buy more Geode bots
+            if (r == Geode) return true
+
+            // If we don't have time to utilize the bot there's no use
+            if (remaining == 1) return false
+
+            // No need to buy this bot if we can produce enough of its
+            // material every minute to create any other bot
+            val maxNeededOf = b.mapValues { maxNeededOf(it.key, b) }
+            if (maxNeededOf.getOrDefault(r, 0) <= bots.getOrDefault(r, 0)) {
+                return false
+            }
+
+            return true
         }
 
-        private fun couldHavePayedForLastIncarnation(cost: Counters<Resource>): Boolean {
-            val lastIncarnationsResources = this.resources unionMinus bots
-            return lastIncarnationsResources.canAfford(cost)
+        private fun maxNeededOf(r: Resource, b: Blueprint): Int =
+            b.maxOf { it.value[r] ?: 0 }
+
+        private fun canBuy(cost: Counters<Resource>): Boolean {
+            return couldAffordEventually(cost)
         }
 
-        private fun produce(r: Resource, cost: Counters<Resource>): State? {
-            if (remaining == 1) return null
-            if (couldNeverPay(cost)) return null
-            if (couldHavePayedForLastIncarnation(cost)) return null
-
+        private fun produce(r: Resource, cost: Counters<Resource>): State {
             var newState = this
             while (newState.remaining > 0 && newState.bots == this.bots) {
                 val available = newState.resources
@@ -76,9 +85,9 @@ class Day2219 : Day<List<Blueprint>>() {
             return newState
         }
 
-        private fun couldNeverPay(cost: Counters<Resource>): Boolean {
-            val maxResources = resources unionPlus (bots scalarTimes remaining)
-            return !maxResources.canAfford(cost)
+        private fun couldAffordEventually(cost: Counters<Resource>): Boolean {
+            val maxResources = resources unionPlus (bots scalarTimes (remaining - 1))
+            return maxResources.canAfford(cost)
         }
 
         private fun Counters<Resource>.canAfford(cost: Counters<Resource>): Boolean =
@@ -149,7 +158,7 @@ fun newState(remaining: Int): State =
         resources = emptyMap(),
         bots = mapOf(Ore to 1),
         remaining = remaining,
-        produced = emptyMap()
+        produced = emptyMap(),
     )
 
 fun maxOf(b: Blueprint, r: Resource, after: Int): Int {

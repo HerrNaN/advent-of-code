@@ -72,7 +72,7 @@ internal class Day2219Test {
 
     @Test
     fun solve2() {
-        assertEquals(62 * 56, Day2219().solve2(testInput))
+        assertEquals(56 * 62, Day2219().solve2(testInput))
     }
 
     @Nested
