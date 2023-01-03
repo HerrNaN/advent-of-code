@@ -76,6 +76,12 @@ enum class Dir2(val p: Point2) {
     DownLeft(Down.p + Left.p)
 }
 
+data class Rot90(val n: Int) {
+    operator fun unaryMinus() = Rot90(-this.n)
+    operator fun plus(other: Rot90) = Rot90(this.n + other.n)
+    operator fun minus(other: Rot90) = this + -other
+}
+
 fun neighbours(p: Point2): List<Point2> = listOf(Dir2.Up, Dir2.Down, Dir2.Left, Dir2.Right).map { p + it.p }
 
 fun MutableSet<Point2>.toGrid(): String {

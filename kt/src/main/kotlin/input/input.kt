@@ -51,7 +51,7 @@ fun downloadInput(year: Year, day: Day): Result<String> {
 
     val resp = runBlocking { client.get("$AOC_URL/$year/day/$day/input") }
     return when (resp.status) {
-        HttpStatusCode.OK -> return Result.success(runBlocking { resp.bodyAsText().trim() })
+        HttpStatusCode.OK -> return Result.success(runBlocking { resp.bodyAsText().trimEnd() })
         else -> Result.failure(Error("couldn't get input from https://adventofcode.com"))
     }
 }
