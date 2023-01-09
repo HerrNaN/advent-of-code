@@ -8,6 +8,8 @@ data class Point2(val x: Int = 0, val y: Int = 0) {
     operator fun unaryMinus(): Point2 = Point2(-x, -y)
     operator fun plus(other: Point2) = Point2(x + other.x, y + other.y)
     operator fun minus(other: Point2) = Point2(x - other.x, y - other.y)
+    operator fun times(other: Point2) = Point2(x * other.x, y * other.y)
+    operator fun rem(n: Int): Point2 = Point2(x % n, y % n)
 
     fun distTo(other: Point2): Int {
         val d = this - other

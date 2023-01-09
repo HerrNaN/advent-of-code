@@ -74,15 +74,15 @@ class Day2222 : Day<Notes>() {
         val size: Int,
         val sideConv: Set<Pair<Pair<Int, Int>, String>>,
     ) {
-        private fun toCubePos(p: Point2): Pair<Point2, String> =
+        fun toCubePos(p: Point2): Pair<Point2, String> =
             Pair(
-                Point2(p.x % size, p.y % size),
+                Point2((p.x - 1) % size, (p.y - 1) % size),
                 sideConv.find { it.first == Pair(p.x / size, p.y / size) }!!.second
             )
 
-        private fun fromCubePos(p: Point2, side: String): Point2 {
+        fun fromCubePos(p: Point2, side: String): Point2 {
             val conv = sideConv.find { it.second == side }!!.first
-            return Point2(p.x + conv.first, p.y + conv.second)
+            return Point2(p.x + 1, p.y + 1) + (Point2(conv.first, conv.second) * Point2(size, size))
         }
 
         fun followPath(from: Point2, dir: MDir2, path: List<Instr>): Pair<Point2, MDir2> {
@@ -93,10 +93,8 @@ class Day2222 : Day<Notes>() {
                     is Instr.Turn -> Triple(curPos, curSide, curDir.rot(i.d))
                     is Instr.Walk -> {
                         move(curPos, curSide, curDir, i.n)
-
                     }
                 }
-                if (nextPos == curPos && nextSide == curSide) break
                 curPos = nextPos
                 curSide = nextSide
                 curDir = nextDir
@@ -109,7 +107,7 @@ class Day2222 : Day<Notes>() {
             var curDir = dir
             var curSide = side
             for (i in (1..n)) {
-                val (next, nextSide, nextDir) = this.next(cur, curSide, curDir)
+                val (next, nextSide, nextDir) = next(cur, curSide, curDir)
 
                 if (nextSide == curSide && cur == next) {
                     break
@@ -123,10 +121,10 @@ class Day2222 : Day<Notes>() {
 
         private fun flip(p: Point2): Point2 =
             when {
-                p.y == size -> p.copy(y = 1)
-                p.x == size -> p.copy(x = 1)
-                p.y == 1 -> p.copy(y = size)
-                p.x == 1 -> p.copy(x = size)
+                p.y == size - 1 -> p.copy(y = 0)
+                p.x == size - 1 -> p.copy(x = 0)
+                p.y == 0 -> p.copy(y = size - 1)
+                p.x == 0 -> p.copy(x = size - 1)
                 else -> throw Error("Don't flip non-edge positions")
             }
 
@@ -135,19 +133,29 @@ class Day2222 : Day<Notes>() {
             return when (this.sides[side]!![next]) {
                 Tile.Open -> Triple(next, side, dir)
                 Tile.Wall -> Triple(p, side, dir)
-                else -> {
+                null -> {
                     // pos <- flip + rot^(-1)(connected_side)
+                    // TODO: DON'T FORGET TO SET COORDINATES CORRECTLY HERE!!!
                     val newSide = sideConnectedTo[side]!![dir]!!
                     val newP = Grid(size).rotatePoint(flip(p), -newSide.rot)
-                    Triple(newP, newSide.name, dir.rot(newSide.rot))
+                    when (sides[newSide.name]!![newP]) {
+                        Tile.Open -> Triple(newP, newSide.name, dir.rot(-newSide.rot))
+                        Tile.Wall -> Triple(p, side, dir)
+                        null -> throw Error("point not found on new side")
+                    }
                 }
             }
         }
     }
 
-    private fun cubeFrom(ns: Notes): Cube {
+    fun cubeFrom(ns: Notes): Cube {
         val size = sqrt(ns.map.size / 6.0).toInt()
-        val sideGrouping = ns.map.entries.groupBy { Pair((it.key.x - 1) / size, (it.key.y - 1) / size) }
+        val sideGrouping = ns.map.mapKeys { it.key - Point2(1, 1) }.entries.groupBy {
+            Pair(
+                it.key.x / size,
+                it.key.y / size
+            )
+        }
         val sideConv = sideGrouping
             .map { it.key }
             .mapIndexed { index, conv -> Pair(conv, ('A' + index).toString()) }
@@ -157,7 +165,7 @@ class Day2222 : Day<Notes>() {
             sideConnectedTo = buildSideConnections(sideConv),
             sides = sideGrouping
                 .mapValues {
-                    it.value.associate { Pair(it.key, it.value) }
+                    it.value.associate { Pair(it.key % size, it.value) }
                 }
                 .mapKeys {
                     sideConv.find { conv -> it.key == conv.first }!!.second
@@ -238,18 +246,20 @@ class Day2222 : Day<Notes>() {
         private fun toGridPoint(p: Point2): Point2 =
             Point2(toGridVal(p.x), toGridVal(p.y))
 
-        private fun toGridVal(v: Int): Int =
-            if (v > (size / 2)) v - (size / 2)
-            else v - 1 - (size / 2)
+        fun toGridVal(v: Int): Int =
+            if (v > (size / 2) - 1)
+                v - (size / 2) + 1
+            else
+                v - (size / 2)
 
-        private fun fromGridPoint(p: Point2): Point2 =
+        fun fromGridPoint(p: Point2): Point2 =
             Point2(fromGridVal(p.x), fromGridVal(p.y))
 
-        private fun fromGridVal(v: Int): Int =
+        fun fromGridVal(v: Int): Int =
             if (v > 0)
-                v + (size / 2)
+                v + (size / 2) - 1
             else
-                v + 1 + (size / 2)
+                v + (size / 2)
 
         private fun rotateGridPoint(p: Point2, r: Rot90): Point2 =
             if (r.n == 0)
